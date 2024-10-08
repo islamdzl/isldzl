@@ -1,0 +1,22 @@
+{
+  "name": "isldzl",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/islamdzl/tiktok-app.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/islamdzl/tiktok-app/issues"
+  },
+  "homepage": "https://github.com/islamdzl/tiktok-app#readme",
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}
