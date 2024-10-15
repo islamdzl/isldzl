@@ -16,8 +16,8 @@ var token
 app.listen(process.env.PORT || 5000, () => {
     console.log('Server is running on port 5000');
 });
-app.get('/',(req, res)=>{
-    res.send(`<h1>Hello islam tokin is ${token}1</h1>`)
+app.get('/islam',(req, res)=>{
+    res.send(`<h1>Hello islam tokin is ${token}</h1>`)
 })
 app.get('/oauth', (req, res) => {
     const csrfState = Math.random().toString(36).substring(2);
@@ -33,7 +33,7 @@ app.get('/oauth', (req, res) => {
     res.redirect(url);
 });
 
-app.get('/callback', (req, res) => {
+app.get('/', (req, res) => {
     const { code, state } = req.query;
     const csrfState = req.cookies.csrfState;
 
