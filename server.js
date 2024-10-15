@@ -11,11 +11,14 @@ app.use(express.static('./public'));
 const CLIENT_KEY = 'awgdk9501hfb0aiy';
 const CLIENT_SECRET = 'AjUcksBh0fv0QAkCp3yZhNIgeuKhblGV';
 const REDIRECT_URI = 'https://isldzl.onrender.com/';
+var token
 
 app.listen(process.env.PORT || 5000, () => {
     console.log('Server is running on port 5000');
 });
-
+app.get('/',(req, res)=>{
+    res.send(`<h1>Hello islam tokin is ${token}1</h1>`)
+})
 app.get('/oauth', (req, res) => {
     const csrfState = Math.random().toString(36).substring(2);
     res.cookie('csrfState', csrfState, { maxAge: 60000 });
@@ -57,7 +60,7 @@ app.get('/callback', (req, res) => {
                 const accessToken = tokenResponse.data.access_token;
 
                 console.log(`Received access token: ${accessToken}`);
-
+                token = accessToken
                 const userXhr = new XMLHttpRequest();
                 userXhr.open('GET', 'https://open.tiktokapis.com/v2/user/info/');
                 userXhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
