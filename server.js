@@ -10,7 +10,7 @@ app.use(express.static('./pabluc'))
 
 const CLIENT_KEY    = 'awgdk9501hfb0aiy'; // القيمة يمكن العثور عليها في بوابة مطوري التطبيق
 const CLIENT_SECRET = 'AjUcksBh0fv0QAkCp3yZhNIgeuKhblGV'; // ضع هنا سر العميل الخاص بك
-const REDIRECT_URI  = 'https://isldzl.onrender.com/home'; // تأكد من استخدام HTTPS
+const REDIRECT_URI  = 'https://isldzl.onrender.com/'; // تأكد من استخدام HTTPS
 
 app.listen(process.env.PORT || 5000, () => {
     console.log('Server is running on port 5000');
@@ -30,10 +30,14 @@ app.get('/oauth', (req, res) => {
     res.redirect(url);
 });
 
-app.get('/home', (req, res) => {
+app.get('/', (req, res) => {
     const { code, state } = req.query;
     const csrfState = req.cookies.csrfState;
     console.log('callback')
+    if (! code && ! state) {
+        res.redirect('https://isldzl.onrender.com/oauth')
+        return
+    }
     if (state !== csrfState) {
         return res.status(403).send('Invalid state parameter');
     }
