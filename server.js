@@ -6,11 +6,11 @@ const XMLHttpRequest = require('xhr2');
 
 app.use(cookieParser());
 app.use(cors());
-app.use(express.static('./pabluc'))
+app.use(express.static('./public'));
 
-const CLIENT_KEY    = 'awgdk9501hfb0aiy'; // القيمة يمكن العثور عليها في بوابة مطوري التطبيق
-const CLIENT_SECRET = 'AjUcksBh0fv0QAkCp3yZhNIgeuKhblGV'; // ضع هنا سر العميل الخاص بك
-const REDIRECT_URI  = 'https://isldzl.onrender.com/'; // تأكد من استخدام HTTPS
+const CLIENT_KEY = 'awgdk9501hfb0aiy';
+const CLIENT_SECRET = 'AjUcksBh0fv0QAkCp3yZhNIgeuKhblGV';
+const REDIRECT_URI = 'https://isldzl.onrender.com/';
 
 app.listen(process.env.PORT || 5000, () => {
     console.log('Server is running on port 5000');
@@ -30,45 +30,55 @@ app.get('/oauth', (req, res) => {
     res.redirect(url);
 });
 
-app.get('/', (req, res) => {
+app.get('/callback', (req, res) => {
     const { code, state } = req.query;
     const csrfState = req.cookies.csrfState;
-    console.log('callback')
-    if (! code && ! state) {
-        res.redirect('https://isldzl.onrender.com/oauth')
-        return
-    }
+
     if (state !== csrfState) {
+        console.error('Invalid state parameter');
         return res.status(403).send('Invalid state parameter');
     }
 
+    if (!code) {
+        console.error('Authorization code not found');
+        return res.status(400).send('Authorization code not found');
+    }
+
+    console.log(`Received code: ${code}`);
+
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'https://open-api.tiktok.com/oauth/access_token/');
+    xhr.open('POST', 'https://open.tiktokapis.com/v2/oauth/token/');
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
     xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            const tokenResponse = JSON.parse(xhr.responseText);
-            const accessToken = tokenResponse.data.access_token;
-                console.log(`{${accessToken}}`)
-            const userXhr = new XMLHttpRequest();
-            userXhr.open('GET', 'https://open-api.tiktok.com/oauth/userinfo/');
-            userXhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                const tokenResponse = JSON.parse(xhr.responseText);
+                const accessToken = tokenResponse.data.access_token;
 
-            userXhr.onreadystatechange = function () {
-                if (userXhr.readyState === 4 && userXhr.status === 200) {
-                    const userInfo = JSON.parse(userXhr.responseText).data;
-                    res.send(`معلومات المستخدم الأساسية: ${JSON.stringify(userInfo)}\n    ${accessToken}`);
-                } else if (userXhr.readyState === 4) {
-                    console.error('Error getting user info:', userXhr.responseText);
-                    res.status(500).send('Error getting user info');
-                }
-            };
+                console.log(`Received access token: ${accessToken}`);
 
-            userXhr.send();
-        } else if (xhr.readyState === 4) {
-            console.error('Error getting access token:', xhr.responseText);
-            res.status(500).send('Error getting access token');
+                const userXhr = new XMLHttpRequest();
+                userXhr.open('GET', 'https://open.tiktokapis.com/v2/user/info/');
+                userXhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
+
+                userXhr.onreadystatechange = function () {
+                    if (userXhr.readyState === 4) {
+                        if (userXhr.status === 200) {
+                            const userInfo = JSON.parse(userXhr.responseText).data;
+                            res.send(`معلومات المستخدم الأساسية: ${JSON.stringify(userInfo)}`);
+                        } else {
+                            console.error('Error getting user info:', userXhr.responseText);
+                            res.status(500).send('Error getting user info');
+                        }
+                    }
+                };
+
+                userXhr.send();
+            } else {
+                console.error('Error getting access token:', xhr.responseText);
+                res.status(500).send('Error getting access token');
+            }
         }
     };
 
