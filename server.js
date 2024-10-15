@@ -8,9 +8,9 @@ app.use(cookieParser());
 app.use(cors());
 app.use(express.static('./public'));
 
-const CLIENT_KEY = 'awgdk9501hfb0aiy';
-const CLIENT_SECRET = 'AjUcksBh0fv0QAkCp3yZhNIgeuKhblGV';
-const REDIRECT_URI = 'https://isldzl.onrender.com/';
+const CLIENT_KEY = 'sbawhg5greoxijmiju';
+const CLIENT_SECRET = 'DMXnWoYt1CDnRrNR3GZQdfKcVOzQuU1b';
+const REDIRECT_URI = 'https://isldzl.onrender.com/home';
 var token
 
 app.listen(process.env.PORT || 5000, () => {
@@ -33,7 +33,7 @@ app.get('/oauth', (req, res) => {
     res.redirect(url);
 });
 
-app.get('/', (req, res) => {
+app.get('/home', (req, res) => {
     const { code, state } = req.query;
     const csrfState = req.cookies.csrfState;
 
